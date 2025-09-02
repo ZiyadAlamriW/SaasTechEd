@@ -9,16 +9,8 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: saas-database
-          property: connectionString
+        value: "postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
       - key: JWT_SECRET
-        generateValue: true
+        value: "your-super-secret-jwt-key-here-make-it-very-long-and-random"
       - key: PORT
         value: 10000
-
-databases:
-  - name: saas-database
-    plan: free
-    databaseName: saas_db
-    user: saas_user
