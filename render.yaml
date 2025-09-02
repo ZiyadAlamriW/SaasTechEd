@@ -3,14 +3,15 @@ services:
     name: saas-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install && npm run build
+    nodeVersion: 18
+    buildCommand: cd backend && npm ci && npm run build
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: "postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+        value: "postgresql://postgres:Asd@358635Ui@db.hasugehunhokytujcxqg.supabase.co:5432/postgres"
       - key: JWT_SECRET
-        value: "your-super-secret-jwt-key-here-make-it-very-long-and-random"
+        value: "8e6df3fda7688e47b15bc20bcf681c9845be8178e217555c4a7b0d19b315de39930e7e05120bef3dea4023c8b6899fb97f8548961313def71bd5afb3c6ac4cd0"
       - key: PORT
         value: 10000
