@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  plan          String   @default("free")
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relations
+  students           Student[]
+  attendance_sessions AttendanceSession[]
+  quizzes            Quiz[]
+  subscriptions      Subscription[]
+
+  @@map("users")
+}
+
+model Student {
+  id      String @id @default(cuid())
+  name    String
+  email   String
+  user_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  attendance_logs AttendanceLog[]
+  grades          Grade[]
+  quiz_answers    QuizAnswer[]
+
+  @@map("students")
+}
+
+model AttendanceSession {
+  id      String @id @default(cuid())
+  date    DateTime
+  user_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  attendance_logs AttendanceLog[]
+
+  @@map("attendance_sessions")
+}
+
+model AttendanceLog {
+  id         String @id @default(cuid())
+  student_id String
+  session_id String
+  status     String // "present", "absent", "late"
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  student Student           @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  session AttendanceSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@unique([student_id, session_id])
+  @@map("attendance_logs")
+}
+
+model Grade {
+  id         String @id @default(cuid())
+  student_id String
+  subject    String
+  score      Float
+  max_score  Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  student Student @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@map("grades")
+}
+
+model Quiz {
+  id        String    @id @default(cuid())
+  title     String
+  user_id   String
+  deadline  DateTime?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user     User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id             String @id @default(cuid())
+  quiz_id        String
+  question       String
+  correct_answer String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relations
+  quiz     Quiz         @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
+  answers  QuizAnswer[]
+
+  @@map("quiz_questions")
+}
+
+model QuizAnswer {
+  id             String @id @default(cuid())
+  student_id     String
+  question_id    String
+  student_answer String
+  is_correct     Boolean
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relations
+  student  Student      @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  question QuizQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@unique([student_id, question_id])
+  @@map("quiz_answers")
+}
+
+model Subscription {
+  id         String    @id @default(cuid())
+  user_id    String
+  plan       String
+  start_date DateTime
+  end_date   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
