@@ -25,7 +25,7 @@ model User {
   quizzes            Quiz[]
   subscriptions      Subscription[]
 
-  @@map("main.users")
+  @@map("users")
 }
 
 model Student {
@@ -42,7 +42,7 @@ model Student {
   grades          Grade[]
   quiz_answers    QuizAnswer[]
 
-  @@map("main.students")
+  @@map("students")
 }
 
 model AttendanceSession {
@@ -56,7 +56,7 @@ model AttendanceSession {
   user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
   attendance_logs AttendanceLog[]
 
-  @@map("main.attendance_sessions")
+  @@map("attendance_sessions")
 }
 
 model AttendanceLog {
@@ -72,7 +72,7 @@ model AttendanceLog {
   session AttendanceSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
 
   @@unique([student_id, session_id])
-  @@map("main.attendance_logs")
+  @@map("attendance_logs")
 }
 
 model Grade {
@@ -87,7 +87,7 @@ model Grade {
   // Relations
   student Student @relation(fields: [student_id], references: [id], onDelete: Cascade)
 
-  @@map("main.grades")
+  @@map("grades")
 }
 
 model Quiz {
@@ -102,7 +102,7 @@ model Quiz {
   user     User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   questions QuizQuestion[]
 
-  @@map("main.quizzes")
+  @@map("quizzes")
 }
 
 model QuizQuestion {
@@ -117,7 +117,7 @@ model QuizQuestion {
   quiz     Quiz         @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
   answers  QuizAnswer[]
 
-  @@map("main.quiz_questions")
+  @@map("quiz_questions")
 }
 
 model QuizAnswer {
@@ -134,7 +134,7 @@ model QuizAnswer {
   question QuizQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
 
   @@unique([student_id, question_id])
-  @@map("main.quiz_answers")
+  @@map("quiz_answers")
 }
 
 model Subscription {
@@ -149,5 +149,5 @@ model Subscription {
   // Relations
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  @@map("main.subscriptions")
+  @@map("subscriptions")
 }

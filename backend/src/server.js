@@ -25,7 +25,7 @@ async function initializeDatabase() {
     
     // Create tables using raw SQL
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.users (
+      CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
@@ -37,7 +37,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.students (
+      CREATE TABLE IF NOT EXISTS students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         email TEXT,
@@ -49,7 +49,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.attendance_sessions (
+      CREATE TABLE IF NOT EXISTS attendance_sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date DATETIME NOT NULL,
         user_id INTEGER NOT NULL,
@@ -60,7 +60,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.attendance_logs (
+      CREATE TABLE IF NOT EXISTS attendance_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
         session_id INTEGER NOT NULL,
@@ -74,7 +74,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.grades (
+      CREATE TABLE IF NOT EXISTS grades (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
         subject TEXT NOT NULL,
@@ -87,7 +87,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.quizzes (
+      CREATE TABLE IF NOT EXISTS quizzes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         user_id INTEGER NOT NULL,
@@ -99,7 +99,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.quiz_questions (
+      CREATE TABLE IF NOT EXISTS quiz_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         quiz_id INTEGER NOT NULL,
         question TEXT NOT NULL,
@@ -111,7 +111,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.quiz_answers (
+      CREATE TABLE IF NOT EXISTS quiz_answers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
         question_id INTEGER NOT NULL,
@@ -126,7 +126,7 @@ async function initializeDatabase() {
     `;
     
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS main.subscriptions (
+      CREATE TABLE IF NOT EXISTS subscriptions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         plan TEXT NOT NULL,
