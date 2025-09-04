@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const Database = require('better-sqlite3');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -14,81 +14,41 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 
-// Initialize SQLite database
-const db = new Database('./dev.db');
+// Simple JSON database
+const dbFile = './data.json';
+let data = {
+  users: [],
+  students: [],
+  attendance_sessions: [],
+  attendance_logs: [],
+  grades: [],
+  quizzes: []
+};
 
-// Create tables
-try {
-  // Users table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Students table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS students (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT,
-      user_id INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Attendance sessions table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS attendance_sessions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      date DATETIME NOT NULL,
-      user_id INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Attendance logs table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS attendance_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      student_id INTEGER,
-      session_id INTEGER,
-      status TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Grades table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS grades (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      student_id INTEGER,
-      subject TEXT NOT NULL,
-      score REAL NOT NULL,
-      max_score REAL NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  // Quizzes table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS quizzes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      user_id INTEGER,
-      deadline DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  console.log('✅ Database tables created successfully!');
-} catch (error) {
-  console.error('❌ Database error:', error);
+// Load data from file
+function loadData() {
+  try {
+    if (fs.existsSync(dbFile)) {
+      const fileData = fs.readFileSync(dbFile, 'utf8');
+      data = JSON.parse(fileData);
+    }
+  } catch (error) {
+    console.error('Error loading data:', error);
+  }
 }
+
+// Save data to file
+function saveData() {
+  try {
+    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error saving data:', error);
+  }
+}
+
+// Initialize data
+loadData();
+console.log('✅ Database initialized successfully!');
 
 // Serve static files from frontend
 if (process.env.NODE_ENV === 'production') {
@@ -108,23 +68,30 @@ app.post('/api/auth/register', (req, res) => {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
+  // Check if email already exists
+  const existingUser = data.users.find(user => user.email === email);
+  if (existingUser) {
+    return res.status(400).json({ error: 'Email already exists' });
+  }
+
   // Simple password hash (in production, use bcrypt)
   const password_hash = Buffer.from(password).toString('base64');
 
-  try {
-    const stmt = db.prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)');
-    const result = stmt.run(name, email, password_hash);
-    
-    res.json({ 
-      message: 'User registered successfully',
-      userId: result.lastInsertRowid 
-    });
-  } catch (err) {
-    if (err.message.includes('UNIQUE constraint failed')) {
-      return res.status(400).json({ error: 'Email already exists' });
-    }
-    return res.status(500).json({ error: 'Registration failed' });
-  }
+  const newUser = {
+    id: Date.now(),
+    name,
+    email,
+    password_hash,
+    created_at: new Date().toISOString()
+  };
+
+  data.users.push(newUser);
+  saveData();
+
+  res.json({ 
+    message: 'User registered successfully',
+    userId: newUser.id 
+  });
 });
 
 app.post('/api/auth/login', (req, res) => {
@@ -135,33 +102,21 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   const password_hash = Buffer.from(password).toString('base64');
-
-  try {
-    const stmt = db.prepare('SELECT * FROM users WHERE email = ? AND password_hash = ?');
-    const user = stmt.get(email, password_hash);
-    
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-    
-    res.json({ 
-      message: 'Login successful',
-      user: { id: user.id, name: user.name, email: user.email }
-    });
-  } catch (err) {
-    return res.status(500).json({ error: 'Login failed' });
+  const user = data.users.find(u => u.email === email && u.password_hash === password_hash);
+  
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password' });
   }
+  
+  res.json({ 
+    message: 'Login successful',
+    user: { id: user.id, name: user.name, email: user.email }
+  });
 });
 
 // Students routes
 app.get('/api/students', (req, res) => {
-  try {
-    const stmt = db.prepare('SELECT * FROM students');
-    const students = stmt.all();
-    res.json(students);
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch students' });
-  }
+  res.json(data.students);
 });
 
 app.post('/api/students', (req, res) => {
@@ -171,38 +126,32 @@ app.post('/api/students', (req, res) => {
     return res.status(400).json({ error: 'Name is required' });
   }
 
-  try {
-    const stmt = db.prepare('INSERT INTO students (name, email) VALUES (?, ?)');
-    const result = stmt.run(name, email);
-    
-    res.json({ 
-      message: 'Student created successfully',
-      studentId: result.lastInsertRowid 
-    });
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to create student' });
-  }
+  const newStudent = {
+    id: Date.now(),
+    name,
+    email: email || '',
+    created_at: new Date().toISOString()
+  };
+
+  data.students.push(newStudent);
+  saveData();
+
+  res.json({ 
+    message: 'Student created successfully',
+    studentId: newStudent.id 
+  });
 });
 
 // Dashboard stats
 app.get('/api/dashboard/stats', (req, res) => {
-  try {
-    const studentsStmt = db.prepare('SELECT COUNT(*) as count FROM students');
-    const attendanceStmt = db.prepare('SELECT COUNT(*) as count FROM attendance_sessions');
-    const quizzesStmt = db.prepare('SELECT COUNT(*) as count FROM quizzes');
-    const gradesStmt = db.prepare('SELECT COUNT(*) as count FROM grades');
-    
-    const stats = {
-      studentsCount: studentsStmt.get().count,
-      attendanceSessionsCount: attendanceStmt.get().count,
-      quizzesCount: quizzesStmt.get().count,
-      gradesCount: gradesStmt.get().count
-    };
-    
-    res.json(stats);
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to get stats' });
-  }
+  const stats = {
+    studentsCount: data.students.length,
+    attendanceSessionsCount: data.attendance_sessions.length,
+    quizzesCount: data.quizzes.length,
+    gradesCount: data.grades.length
+  };
+  
+  res.json(stats);
 });
 
 // Catch all handler for React app
