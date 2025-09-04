@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, Calendar, BookOpen, FileText, TrendingUp, TrendingDown } from 'lucide-react';
 import { studentService } from '../services/studentService';
 import { attendanceService } from '../services/attendanceService';
@@ -7,6 +8,7 @@ import { quizService } from '../services/quizService';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     students: 0,
     attendanceRate: 0,
@@ -58,6 +60,23 @@ const Dashboard = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Quick action handlers
+  const handleAddStudent = () => {
+    navigate('/students');
+  };
+
+  const handleCreateAttendanceSession = () => {
+    navigate('/attendance');
+  };
+
+  const handleAddGrades = () => {
+    navigate('/grades');
+  };
+
+  const handleCreateQuiz = () => {
+    navigate('/quizzes');
   };
 
   const statCards = [
@@ -161,19 +180,31 @@ const Dashboard = () => {
         </div>
         <div className="card-content">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <button 
+              onClick={handleAddStudent}
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+            >
               <Users className="h-5 w-5 ml-2" />
               إضافة طالب جديد
             </button>
-            <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <button 
+              onClick={handleCreateAttendanceSession}
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+            >
               <Calendar className="h-5 w-5 ml-2" />
               إنشاء جلسة حضور
             </button>
-            <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <button 
+              onClick={handleAddGrades}
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+            >
               <BookOpen className="h-5 w-5 ml-2" />
               إضافة درجات
             </button>
-            <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <button 
+              onClick={handleCreateQuiz}
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+            >
               <FileText className="h-5 w-5 ml-2" />
               إنشاء اختبار
             </button>
