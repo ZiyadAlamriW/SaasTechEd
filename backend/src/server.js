@@ -142,6 +142,7 @@ async function initializeDatabase() {
     
   } catch (error) {
     console.error('❌ Error creating database tables:', error);
+    throw error; // Re-throw to stop server startup
   } finally {
     await prisma.$disconnect();
   }
@@ -265,14 +266,25 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, async () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  
-  // Initialize database tables
-  await initializeDatabase();
-});
+// Initialize database first, then start server
+async function startServer() {
+  try {
+    console.log('🔧 Initializing database...');
+    await initializeDatabase();
+    console.log('✅ Database initialized successfully!');
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();
 
 module.exports = app;
