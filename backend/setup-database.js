@@ -29,8 +29,7 @@ async function setupDatabase() {
         email TEXT,
         user_id INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `;
     console.log('✅ Created students table');
@@ -41,8 +40,7 @@ async function setupDatabase() {
         date DATETIME NOT NULL,
         user_id INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `;
     console.log('✅ Created attendance_sessions table');
@@ -55,8 +53,6 @@ async function setupDatabase() {
         status TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-        FOREIGN KEY (session_id) REFERENCES attendance_sessions(id) ON DELETE CASCADE,
         UNIQUE(student_id, session_id)
       );
     `;
@@ -70,8 +66,7 @@ async function setupDatabase() {
         score REAL NOT NULL,
         max_score REAL NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `;
     console.log('✅ Created grades table');
@@ -83,8 +78,7 @@ async function setupDatabase() {
         user_id INTEGER NOT NULL,
         deadline DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `;
     console.log('✅ Created quizzes table');
@@ -96,8 +90,7 @@ async function setupDatabase() {
         question TEXT NOT NULL,
         correct_answer TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `;
     console.log('✅ Created quiz_questions table');
@@ -111,8 +104,6 @@ async function setupDatabase() {
         is_correct BOOLEAN NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-        FOREIGN KEY (question_id) REFERENCES quiz_questions(id) ON DELETE CASCADE,
         UNIQUE(student_id, question_id)
       );
     `;
@@ -126,8 +117,7 @@ async function setupDatabase() {
         start_date DATETIME NOT NULL,
         end_date DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `;
     console.log('✅ Created subscriptions table');
