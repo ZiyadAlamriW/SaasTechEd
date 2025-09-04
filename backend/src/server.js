@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 require('dotenv').config();
 
 const app = express();
@@ -15,12 +15,12 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize SQLite database
-const db = new sqlite3.Database('./dev.db');
+const db = new Database('./dev.db');
 
 // Create tables
-db.serialize(() => {
+try {
   // Users table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -31,7 +31,7 @@ db.serialize(() => {
   `);
 
   // Students table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS students (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -42,7 +42,7 @@ db.serialize(() => {
   `);
 
   // Attendance sessions table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS attendance_sessions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       date DATETIME NOT NULL,
@@ -52,7 +52,7 @@ db.serialize(() => {
   `);
 
   // Attendance logs table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS attendance_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       student_id INTEGER,
@@ -63,7 +63,7 @@ db.serialize(() => {
   `);
 
   // Grades table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS grades (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       student_id INTEGER,
@@ -75,7 +75,7 @@ db.serialize(() => {
   `);
 
   // Quizzes table
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS quizzes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
@@ -86,7 +86,9 @@ db.serialize(() => {
   `);
 
   console.log('✅ Database tables created successfully!');
-});
+} catch (error) {
+  console.error('❌ Database error:', error);
+}
 
 // Serve static files from frontend
 if (process.env.NODE_ENV === 'production') {
@@ -109,23 +111,20 @@ app.post('/api/auth/register', (req, res) => {
   // Simple password hash (in production, use bcrypt)
   const password_hash = Buffer.from(password).toString('base64');
 
-  db.run(
-    'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
-    [name, email, password_hash],
-    function(err) {
-      if (err) {
-        if (err.message.includes('UNIQUE constraint failed')) {
-          return res.status(400).json({ error: 'Email already exists' });
-        }
-        return res.status(500).json({ error: 'Registration failed' });
-      }
-      
-      res.json({ 
-        message: 'User registered successfully',
-        userId: this.lastID 
-      });
+  try {
+    const stmt = db.prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)');
+    const result = stmt.run(name, email, password_hash);
+    
+    res.json({ 
+      message: 'User registered successfully',
+      userId: result.lastInsertRowid 
+    });
+  } catch (err) {
+    if (err.message.includes('UNIQUE constraint failed')) {
+      return res.status(400).json({ error: 'Email already exists' });
     }
-  );
+    return res.status(500).json({ error: 'Registration failed' });
+  }
 });
 
 app.post('/api/auth/login', (req, res) => {
@@ -137,34 +136,32 @@ app.post('/api/auth/login', (req, res) => {
 
   const password_hash = Buffer.from(password).toString('base64');
 
-  db.get(
-    'SELECT * FROM users WHERE email = ? AND password_hash = ?',
-    [email, password_hash],
-    (err, user) => {
-      if (err) {
-        return res.status(500).json({ error: 'Login failed' });
-      }
-      
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid email or password' });
-      }
-      
-      res.json({ 
-        message: 'Login successful',
-        user: { id: user.id, name: user.name, email: user.email }
-      });
+  try {
+    const stmt = db.prepare('SELECT * FROM users WHERE email = ? AND password_hash = ?');
+    const user = stmt.get(email, password_hash);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
-  );
+    
+    res.json({ 
+      message: 'Login successful',
+      user: { id: user.id, name: user.name, email: user.email }
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Login failed' });
+  }
 });
 
 // Students routes
 app.get('/api/students', (req, res) => {
-  db.all('SELECT * FROM students', (err, students) => {
-    if (err) {
-      return res.status(500).json({ error: 'Failed to fetch students' });
-    }
+  try {
+    const stmt = db.prepare('SELECT * FROM students');
+    const students = stmt.all();
     res.json(students);
-  });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch students' });
+  }
 });
 
 app.post('/api/students', (req, res) => {
@@ -174,55 +171,38 @@ app.post('/api/students', (req, res) => {
     return res.status(400).json({ error: 'Name is required' });
   }
 
-  db.run(
-    'INSERT INTO students (name, email) VALUES (?, ?)',
-    [name, email],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to create student' });
-      }
-      
-      res.json({ 
-        message: 'Student created successfully',
-        studentId: this.lastID 
-      });
-    }
-  );
+  try {
+    const stmt = db.prepare('INSERT INTO students (name, email) VALUES (?, ?)');
+    const result = stmt.run(name, email);
+    
+    res.json({ 
+      message: 'Student created successfully',
+      studentId: result.lastInsertRowid 
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to create student' });
+  }
 });
 
 // Dashboard stats
 app.get('/api/dashboard/stats', (req, res) => {
-  const stats = {};
-  
-  // Get students count
-  db.get('SELECT COUNT(*) as count FROM students', (err, result) => {
-    if (err) return res.status(500).json({ error: 'Failed to get stats' });
+  try {
+    const studentsStmt = db.prepare('SELECT COUNT(*) as count FROM students');
+    const attendanceStmt = db.prepare('SELECT COUNT(*) as count FROM attendance_sessions');
+    const quizzesStmt = db.prepare('SELECT COUNT(*) as count FROM quizzes');
+    const gradesStmt = db.prepare('SELECT COUNT(*) as count FROM grades');
     
-    stats.studentsCount = result.count;
+    const stats = {
+      studentsCount: studentsStmt.get().count,
+      attendanceSessionsCount: attendanceStmt.get().count,
+      quizzesCount: quizzesStmt.get().count,
+      gradesCount: gradesStmt.get().count
+    };
     
-    // Get attendance sessions count
-    db.get('SELECT COUNT(*) as count FROM attendance_sessions', (err, result) => {
-      if (err) return res.status(500).json({ error: 'Failed to get stats' });
-      
-      stats.attendanceSessionsCount = result.count;
-      
-      // Get quizzes count
-      db.get('SELECT COUNT(*) as count FROM quizzes', (err, result) => {
-        if (err) return res.status(500).json({ error: 'Failed to get stats' });
-        
-        stats.quizzesCount = result.count;
-        
-        // Get grades count
-        db.get('SELECT COUNT(*) as count FROM grades', (err, result) => {
-          if (err) return res.status(500).json({ error: 'Failed to get stats' });
-          
-          stats.gradesCount = result.count;
-          
-          res.json(stats);
-        });
-      });
-    });
-  });
+    res.json(stats);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to get stats' });
+  }
 });
 
 // Catch all handler for React app
