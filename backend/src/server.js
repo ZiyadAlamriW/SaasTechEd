@@ -31,6 +31,10 @@ function loadData() {
     if (fs.existsSync(dbFile)) {
       const fileData = fs.readFileSync(dbFile, 'utf8');
       data = JSON.parse(fileData);
+    } else {
+      // Create initial data file
+      saveData();
+      console.log('✅ Created initial data file');
     }
   } catch (error) {
     console.error('Error loading data:', error);
