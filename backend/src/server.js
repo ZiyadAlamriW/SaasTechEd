@@ -18,6 +18,9 @@ const PORT = process.env.PORT || 3000;
 
 // Database initialization is now handled by setup-database.js during build
 
+// Trust proxy for Render deployment
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet());
 app.use(cors({

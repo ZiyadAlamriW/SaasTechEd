@@ -7,6 +7,11 @@ async function setupDatabase() {
   
   try {
     console.log('🔧 Setting up database tables...');
+    console.log('📁 Database path:', process.env.DATABASE_URL || 'file:./dev.db');
+    
+    // Test database connection
+    await prisma.$connect();
+    console.log('✅ Database connection successful');
     
     // Create tables using raw SQL
     await prisma.$executeRaw`
@@ -123,6 +128,12 @@ async function setupDatabase() {
     console.log('✅ Created subscriptions table');
     
     console.log('🎉 All database tables created successfully!');
+    
+    // Verify tables were created
+    const tables = await prisma.$queryRaw`
+      SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';
+    `;
+    console.log('📋 Created tables:', tables);
     
   } catch (error) {
     console.error('❌ Error setting up database:', error);
