@@ -3,7 +3,7 @@ services:
     name: saas-backend
     env: node
     plan: free
-    buildCommand: npm install && npm run build && cd backend && npx prisma db push
+    buildCommand: npm install && npm run build && cd backend && node migrate.js
     startCommand: npm start
     envVars:
       - key: NODE_ENV
