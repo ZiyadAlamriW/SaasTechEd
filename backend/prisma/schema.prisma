@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            Int      @id @default(autoincrement())
   name          String
   email         String   @unique
   password_hash String
@@ -29,10 +29,10 @@ model User {
 }
 
 model Student {
-  id      String @id @default(cuid())
+  id      Int    @id @default(autoincrement())
   name    String
   email   String
-  user_id String
+  user_id Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -46,9 +46,9 @@ model Student {
 }
 
 model AttendanceSession {
-  id      String @id @default(cuid())
+  id      Int      @id @default(autoincrement())
   date    DateTime
-  user_id String
+  user_id Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -60,9 +60,9 @@ model AttendanceSession {
 }
 
 model AttendanceLog {
-  id         String @id @default(cuid())
-  student_id String
-  session_id String
+  id         Int      @id @default(autoincrement())
+  student_id Int
+  session_id Int
   status     String // "present", "absent", "late"
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -76,8 +76,8 @@ model AttendanceLog {
 }
 
 model Grade {
-  id         String @id @default(cuid())
-  student_id String
+  id         Int      @id @default(autoincrement())
+  student_id Int
   subject    String
   score      Float
   max_score  Float
@@ -91,9 +91,9 @@ model Grade {
 }
 
 model Quiz {
-  id        String    @id @default(cuid())
+  id        Int       @id @default(autoincrement())
   title     String
-  user_id   String
+  user_id   Int
   deadline  DateTime?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -106,8 +106,8 @@ model Quiz {
 }
 
 model QuizQuestion {
-  id             String @id @default(cuid())
-  quiz_id        String
+  id             Int      @id @default(autoincrement())
+  quiz_id        Int
   question       String
   correct_answer String
   created_at     DateTime @default(now())
@@ -121,9 +121,9 @@ model QuizQuestion {
 }
 
 model QuizAnswer {
-  id             String @id @default(cuid())
-  student_id     String
-  question_id    String
+  id             Int      @id @default(autoincrement())
+  student_id     Int
+  question_id    Int
   student_answer String
   is_correct     Boolean
   created_at     DateTime @default(now())
@@ -138,8 +138,8 @@ model QuizAnswer {
 }
 
 model Subscription {
-  id         String    @id @default(cuid())
-  user_id    String
+  id         Int       @id @default(autoincrement())
+  user_id    Int
   plan       String
   start_date DateTime
   end_date   DateTime?
