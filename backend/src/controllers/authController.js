@@ -28,6 +28,7 @@ const register = async (req, res) => {
     // Hash password
     const saltRounds = 12;
     const password_hash = await bcrypt.hash(password, saltRounds);
+    console.log('Registration:', { email: email.toLowerCase(), hasPasswordHash: !!password_hash });
 
     // Create user
     const user = await prisma.user.create({
@@ -45,6 +46,8 @@ const register = async (req, res) => {
         created_at: true
       }
     });
+
+    console.log('User created successfully:', { id: user.id, email: user.email });
 
     // Generate JWT token
     const token = jwt.sign(
@@ -82,13 +85,19 @@ const login = async (req, res) => {
       where: { email: email.toLowerCase() }
     });
 
+    console.log('Login attempt:', { email: email.toLowerCase(), userFound: !!user });
+
     if (!user) {
+      console.log('User not found for email:', email.toLowerCase());
       return unauthorizedResponse(res, 'Invalid email or password');
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    console.log('Password validation:', { isValid: isPasswordValid, hasPasswordHash: !!user.password_hash });
+    
     if (!isPasswordValid) {
+      console.log('Invalid password for user:', user.email);
       return unauthorizedResponse(res, 'Invalid email or password');
     }
 
