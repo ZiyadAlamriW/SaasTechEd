@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     nodeVersion: 18
-    buildCommand: "cd frontend && npm install && npm run build"
+    buildCommand: "echo 'No build needed'"
     startCommand: "cd backend && npm install && npm start"
     envVars:
       - key: NODE_ENV

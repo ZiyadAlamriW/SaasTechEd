@@ -88,9 +88,9 @@ db.serialize(() => {
   console.log('✅ Database tables created successfully!');
 });
 
-// Serve static files from React app
+// Serve static files from frontend
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+  app.use(express.static(path.join(__dirname, '../../frontend')));
 }
 
 // Health check
@@ -228,7 +228,7 @@ app.get('/api/dashboard/stats', (req, res) => {
 // Catch all handler for React app
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+    res.sendFile(path.join(__dirname, '../../frontend/index.html'));
   });
 }
 
