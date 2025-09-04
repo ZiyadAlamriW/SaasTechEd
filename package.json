@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Simple SaaS School Management System",
   "scripts": {
-    "build": "echo 'Build completed'"
+    "build": "echo 'Build completed'",
+    "start": "cd backend && npm start"
   }
 }

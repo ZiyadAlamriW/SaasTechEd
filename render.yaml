@@ -5,7 +5,7 @@ services:
     plan: free
     nodeVersion: 18
     buildCommand: "npm run build && cd backend && npm install"
-    startCommand: "cd backend && npm start"
+    startCommand: "npm start"
     envVars:
       - key: NODE_ENV
         value: "production"
