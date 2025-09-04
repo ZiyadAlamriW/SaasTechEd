@@ -30,35 +30,81 @@ function App() {
     localStorage.removeItem('user');
   };
 
+  const styles = {
+    app: {
+      minHeight: '100vh',
+      backgroundColor: '#f9fafb'
+    },
+    nav: {
+      backgroundColor: 'white',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      borderBottom: '1px solid #e5e7eb'
+    },
+    navContainer: {
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '0 20px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      height: '64px'
+    },
+    navTitle: {
+      fontSize: '20px',
+      fontWeight: '600',
+      color: '#1f2937'
+    },
+    navRight: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '20px'
+    },
+    navText: {
+      color: '#374151'
+    },
+    logoutButton: {
+      backgroundColor: '#ef4444',
+      color: 'white',
+      padding: '8px 16px',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '14px'
+    },
+    loading: {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '20px'
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div style={styles.loading}>
+        Loading...
       </div>
     );
   }
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div style={styles.app}>
         {user && (
-          <nav className="bg-white shadow-sm border-b">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between h-16">
-                <div className="flex items-center">
-                  <h1 className="text-xl font-semibold text-gray-900">
-                    نظام إدارة المدرسة
-                  </h1>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">مرحباً، {user.name}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-                  >
-                    تسجيل الخروج
-                  </button>
-                </div>
+          <nav style={styles.nav}>
+            <div style={styles.navContainer}>
+              <h1 style={styles.navTitle}>
+                نظام إدارة المدرسة
+              </h1>
+              <div style={styles.navRight}>
+                <span style={styles.navText}>مرحباً، {user.name}</span>
+                <button
+                  onClick={handleLogout}
+                  style={styles.logoutButton}
+                >
+                  تسجيل الخروج
+                </button>
               </div>
             </div>
           </nav>

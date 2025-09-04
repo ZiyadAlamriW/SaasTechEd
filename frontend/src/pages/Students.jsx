@@ -43,110 +43,201 @@ const Students = () => {
     }
   };
 
+  const styles = {
+    container: {
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '20px'
+    },
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '30px'
+    },
+    title: {
+      fontSize: '32px',
+      fontWeight: 'bold',
+      color: '#1f2937'
+    },
+    button: {
+      backgroundColor: '#3b82f6',
+      color: 'white',
+      padding: '10px 20px',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '16px'
+    },
+    formCard: {
+      backgroundColor: 'white',
+      padding: '20px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      marginBottom: '20px'
+    },
+    formTitle: {
+      fontSize: '18px',
+      fontWeight: '600',
+      marginBottom: '20px',
+      color: '#1f2937'
+    },
+    formGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+      gap: '20px',
+      marginBottom: '20px'
+    },
+    input: {
+      width: '100%',
+      padding: '12px',
+      border: '1px solid #d1d5db',
+      borderRadius: '6px',
+      fontSize: '16px',
+      boxSizing: 'border-box'
+    },
+    label: {
+      display: 'block',
+      fontSize: '14px',
+      fontWeight: '500',
+      color: '#374151',
+      marginBottom: '5px'
+    },
+    submitButton: {
+      backgroundColor: '#10b981',
+      color: 'white',
+      padding: '10px 20px',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '16px'
+    },
+    tableCard: {
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+    },
+    tableHeader: {
+      padding: '20px',
+      borderBottom: '1px solid #e5e7eb'
+    },
+    tableTitle: {
+      fontSize: '18px',
+      fontWeight: '600',
+      color: '#1f2937'
+    },
+    table: {
+      width: '100%',
+      borderCollapse: 'collapse'
+    },
+    th: {
+      padding: '12px',
+      textAlign: 'right',
+      fontSize: '12px',
+      fontWeight: '500',
+      color: '#6b7280',
+      backgroundColor: '#f9fafb',
+      borderBottom: '1px solid #e5e7eb'
+    },
+    td: {
+      padding: '12px',
+      borderBottom: '1px solid #e5e7eb'
+    },
+    emptyState: {
+      textAlign: 'center',
+      padding: '40px',
+      color: '#6b7280'
+    },
+    loading: {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '20px'
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">جاري التحميل...</div>
+      <div style={styles.loading}>
+        جاري التحميل...
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">إدارة الطلاب</h1>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            {showForm ? 'إلغاء' : 'إضافة طالب جديد'}
-          </button>
-        </div>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>إدارة الطلاب</h1>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          style={styles.button}
+        >
+          {showForm ? 'إلغاء' : 'إضافة طالب جديد'}
+        </button>
+      </div>
 
-        {showForm && (
-          <div className="bg-white shadow rounded-lg p-6 mb-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">إضافة طالب جديد</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    اسم الطالب
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    البريد الإلكتروني (اختياري)
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+      {showForm && (
+        <div style={styles.formCard}>
+          <h2 style={styles.formTitle}>إضافة طالب جديد</h2>
+          <form onSubmit={handleSubmit}>
+            <div style={styles.formGrid}>
+              <div>
+                <label style={styles.label}>اسم الطالب</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  style={styles.input}
+                />
               </div>
-              <div className="mt-4">
-                <button
-                  type="submit"
-                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-                >
-                  إضافة الطالب
-                </button>
+              <div>
+                <label style={styles.label}>البريد الإلكتروني (اختياري)</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  style={styles.input}
+                />
               </div>
-            </form>
+            </div>
+            <button type="submit" style={styles.submitButton}>
+              إضافة الطالب
+            </button>
+          </form>
+        </div>
+      )}
+
+      <div style={styles.tableCard}>
+        <div style={styles.tableHeader}>
+          <h2 style={styles.tableTitle}>قائمة الطلاب</h2>
+        </div>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th style={styles.th}>الاسم</th>
+              <th style={styles.th}>البريد الإلكتروني</th>
+              <th style={styles.th}>تاريخ الإضافة</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((student) => (
+              <tr key={student.id}>
+                <td style={styles.td}>{student.name}</td>
+                <td style={styles.td}>{student.email || 'غير محدد'}</td>
+                <td style={styles.td}>
+                  {new Date(student.created_at).toLocaleDateString('ar-SA')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {students.length === 0 && (
+          <div style={styles.emptyState}>
+            لا يوجد طلاب مسجلين بعد
           </div>
         )}
-
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">قائمة الطلاب</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    الاسم
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    البريد الإلكتروني
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    تاريخ الإضافة
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {students.map((student) => (
-                  <tr key={student.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {student.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {student.email || 'غير محدد'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(student.created_at).toLocaleDateString('ar-SA')}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {students.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                لا يوجد طلاب مسجلين بعد
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

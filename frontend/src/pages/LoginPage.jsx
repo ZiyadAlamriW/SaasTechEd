@@ -51,90 +51,141 @@ const LoginPage = ({ onLogin }) => {
     });
   };
 
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#f9fafb',
+      padding: '20px'
+    },
+    formContainer: {
+      maxWidth: '400px',
+      width: '100%',
+      backgroundColor: 'white',
+      padding: '40px',
+      borderRadius: '8px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+    },
+    title: {
+      textAlign: 'center',
+      fontSize: '24px',
+      fontWeight: 'bold',
+      marginBottom: '30px',
+      color: '#1f2937'
+    },
+    input: {
+      width: '100%',
+      padding: '12px',
+      border: '1px solid #d1d5db',
+      borderRadius: '6px',
+      fontSize: '16px',
+      marginBottom: '16px',
+      boxSizing: 'border-box'
+    },
+    button: {
+      width: '100%',
+      padding: '12px',
+      backgroundColor: '#3b82f6',
+      color: 'white',
+      border: 'none',
+      borderRadius: '6px',
+      fontSize: '16px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      marginBottom: '16px'
+    },
+    buttonDisabled: {
+      opacity: 0.5,
+      cursor: 'not-allowed'
+    },
+    link: {
+      textAlign: 'center',
+      color: '#3b82f6',
+      cursor: 'pointer',
+      textDecoration: 'none'
+    },
+    error: {
+      color: '#ef4444',
+      fontSize: '14px',
+      marginBottom: '16px',
+      textAlign: 'center'
+    },
+    success: {
+      color: '#10b981',
+      fontSize: '14px',
+      marginBottom: '16px',
+      textAlign: 'center'
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+    <div style={styles.container}>
+      <div style={styles.formContainer}>
+        <h2 style={styles.title}>
+          {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
+        </h2>
+        <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                الاسم
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required={!isLogin}
-                value={formData.name}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+            <input
+              name="name"
+              type="text"
+              placeholder="الاسم"
+              required={!isLogin}
+              value={formData.name}
+              onChange={handleChange}
+              style={styles.input}
+            />
           )}
           
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              البريد الإلكتروني
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          <input
+            name="email"
+            type="email"
+            placeholder="البريد الإلكتروني"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            style={styles.input}
+          />
           
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              كلمة المرور
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          <input
+            name="password"
+            type="password"
+            placeholder="كلمة المرور"
+            required
+            value={formData.password}
+            onChange={handleChange}
+            style={styles.input}
+          />
 
           {error && (
-            <div className={`text-sm ${error.includes('نجح') ? 'text-green-600' : 'text-red-600'}`}>
+            <div style={error.includes('نجح') ? styles.success : styles.error}>
               {error}
             </div>
           )}
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {loading ? 'جاري التحميل...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...styles.button,
+              ...(loading ? styles.buttonDisabled : {})
+            }}
+          >
+            {loading ? 'جاري التحميل...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
+          </button>
 
-          <div className="text-center">
-            <button
-              type="button"
+          <div style={styles.link}>
+            <span
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError('');
                 setFormData({ name: '', email: '', password: '' });
               }}
-              className="text-blue-600 hover:text-blue-500"
             >
               {isLogin ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
-            </button>
+            </span>
           </div>
         </form>
       </div>

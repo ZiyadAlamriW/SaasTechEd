@@ -1,15 +1,40 @@
-import { useState } from 'react';
-
 const Grades = () => {
+  const styles = {
+    container: {
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '20px'
+    },
+    title: {
+      fontSize: '32px',
+      fontWeight: 'bold',
+      marginBottom: '30px',
+      color: '#1f2937'
+    },
+    card: {
+      backgroundColor: 'white',
+      padding: '20px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+    },
+    cardTitle: {
+      fontSize: '18px',
+      fontWeight: '600',
+      marginBottom: '20px',
+      color: '#1f2937'
+    },
+    text: {
+      color: '#6b7280'
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">إدارة الدرجات</h1>
-        
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">الدرجات</h2>
-          <p className="text-gray-600">هذه الصفحة قيد التطوير...</p>
-        </div>
+    <div style={styles.container}>
+      <h1 style={styles.title}>إدارة الدرجات</h1>
+      
+      <div style={styles.card}>
+        <h2 style={styles.cardTitle}>الدرجات</h2>
+        <p style={styles.text}>هذه الصفحة قيد التطوير...</p>
       </div>
     </div>
   );
