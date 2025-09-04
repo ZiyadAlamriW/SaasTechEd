@@ -16,7 +16,9 @@ const quizRoutes = require('./routes/quizzes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database initialization is now handled by setup-database.js during build
+// Database initialization is handled by init-db.js during build
+// Import database initialization
+const { initDatabase } = require('../init-db');
 
 // Trust proxy for Render deployment
 app.set('trust proxy', 1);
@@ -92,12 +94,25 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server (database is initialized by setup-database.js during build)
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-});
+// Start server with database initialization
+async function startServer() {
+  try {
+    console.log('🔧 Initializing database...');
+    await initDatabase();
+    console.log('✅ Database ready');
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 // Server is already started above
 
