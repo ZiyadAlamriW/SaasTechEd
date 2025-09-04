@@ -52,7 +52,7 @@ async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS attendance_sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date DATETIME NOT NULL,
-        user_id INTEGER NOT NULL,
+ا        user_id INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
