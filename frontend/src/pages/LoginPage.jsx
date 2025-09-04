@@ -1,57 +1,53 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
-import useAuthStore from '../stores/authStore';
-import toast from 'react-hot-toast';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
+    password: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { login, register } = useAuthStore();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const from = location.state?.from?.pathname || '/dashboard';
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
+    setError('');
 
     try {
-      let result;
-      if (isLogin) {
-        result = await login(formData.email, formData.password);
-      } else {
-        result = await register(formData.name, formData.email, formData.password);
-      }
+      const url = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      if (result.success) {
-        toast.success(isLogin ? 'تم تسجيل الدخول بنجاح' : 'تم إنشاء الحساب بنجاح');
-        navigate(from, { replace: true });
-      } else {
-        toast.error(result.error || 'حدث خطأ');
-        if (result.errors) {
-          result.errors.forEach(error => toast.error(error));
+      const data = await response.json();
+
+      if (response.ok) {
+        if (isLogin) {
+          onLogin(data.user);
+        } else {
+          setError('تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.');
+          setIsLogin(true);
         }
+      } else {
+        setError(data.error || 'حدث خطأ');
       }
-    } catch (error) {
-      toast.error('حدث خطأ في الاتصال');
+    } catch (err) {
+      setError('خطأ في الاتصال');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -62,107 +58,82 @@ const LoginPage = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {isLogin ? 'أو' : 'أو'}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="font-medium text-primary-600 hover:text-primary-500 mr-1"
-            >
-              {isLogin ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
-            </button>
-          </p>
         </div>
-        
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {!isLogin && (
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  الاسم
-                </label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required={!isLogin}
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="input pr-10"
-                    placeholder="أدخل اسمك"
-                  />
-                </div>
-              </div>
-            )}
-
+          {!isLogin && (
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                البريد الإلكتروني
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                الاسم
               </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="input pr-10"
-                  placeholder="أدخل بريدك الإلكتروني"
-                />
-              </div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required={!isLogin}
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                كلمة المرور
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="input pr-10 pl-10"
-                  placeholder="أدخل كلمة المرور"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 left-0 pl-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
+          )}
+          
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              البريد الإلكتروني
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
+          
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              كلمة المرور
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {error && (
+            <div className={`text-sm ${error.includes('نجح') ? 'text-green-600' : 'text-red-600'}`}>
+              {error}
+            </div>
+          )}
 
           <div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-              ) : (
-                isLogin ? 'تسجيل الدخول' : 'إنشاء الحساب'
-              )}
+              {loading ? 'جاري التحميل...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError('');
+                setFormData({ name: '', email: '', password: '' });
+              }}
+              className="text-blue-600 hover:text-blue-500"
+            >
+              {isLogin ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
             </button>
           </div>
         </form>
