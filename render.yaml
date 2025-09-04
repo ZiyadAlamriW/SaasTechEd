@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: postgresql://postgres:Mm147258@db.urvzvodaxghqatuponaf.supabase.co:5432/postgres
+        value: postgresql://postgres:Asd@358635Ui@db.urvzvodaxghqatuponaf.supabase.co:5432/postgres
       - key: JWT_SECRET
         value: 8e6df3fda7688e47b15bc20bcf681c9845be8178e217555c4a7b0d19b315de39930e7e05120bef3dea4023c8b6899fb97f8548961313def71bd5afb3c6ac4cd0
       - key: PORT
