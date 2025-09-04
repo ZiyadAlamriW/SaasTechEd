@@ -60,7 +60,7 @@ const register = async (req, res) => {
 
   } catch (error) {
     console.error('Registration error:', error);
-    return errorResponse(res, 'Registration failed', 500);
+    return errorResponse(res, 'Registration failed', 500, error.message);
   }
 };
 
