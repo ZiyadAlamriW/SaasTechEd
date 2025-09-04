@@ -36,7 +36,9 @@ const corsOptions = {
       ? [
           'https://your-app.onrender.com',
           'https://saas-school-management.onrender.com',
-          // Add your production domain here
+          'https://saas-school-management-v2.onrender.com',
+          // Allow all render.com subdomains for testing
+          /^https:\/\/.*\.onrender\.com$/
         ]
       : [
           'http://localhost:3000', 
@@ -45,9 +47,20 @@ const corsOptions = {
           'http://127.0.0.1:3001'
         ];
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Check if origin matches any allowed origin (including regex)
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return allowedOrigin === origin;
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
